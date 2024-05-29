@@ -4,6 +4,7 @@ import { getAuth, signOut } from "firebase/auth";
 import { getDatabase, ref, push, set, onValue, remove, update } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import Notifications from "./Notifications";
+import Chat from "./Chat";
 
 const database = getDatabase(appFirebase);
 const auth = getAuth(appFirebase);
@@ -139,6 +140,7 @@ const Home = () => {
           <button onClick={saveData}>Save data</button>
         )}
       </div>
+      <Chat />
       <Notifications userId={user.uid} />
       <div>
         <h2>Product List</h2>
