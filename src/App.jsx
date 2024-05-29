@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import appFirebase from './credenciales';
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Login from './components/Login';
 import Home from './components/Home';
 import Admin from './components/Admin';
@@ -11,18 +11,20 @@ const auth = getAuth(appFirebase);
 
 function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Añadir un estado de carga
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
+      setUser(user);
+      setLoading(false); // Cambiar el estado de carga
     });
 
     return () => unsubscribe();
   }, []);
+
+  if (loading) {
+    return <div>Cargando...</div>; // Mostrar un indicador de carga mientras se determina el estado de autenticación
+  }
 
   return (
     <Router>
@@ -37,7 +39,6 @@ function App() {
           path="/"
           element={user ? <Navigate to="/home" /> : <Navigate to="/login" />}
         />
-        
       </Routes>
     </Router>
   );

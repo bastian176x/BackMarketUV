@@ -3,6 +3,7 @@ import appFirebase from "../credenciales";
 import { getAuth, signOut } from "firebase/auth";
 import { getDatabase, ref, push, set, onValue, remove, update } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import Notifications from "./Notifications";
 
 const database = getDatabase(appFirebase);
 const auth = getAuth(appFirebase);
@@ -16,6 +17,8 @@ const Home = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
   const [editProductImageUrl, setEditProductImageUrl] = useState("");
+
+  const user = auth.currentUser;
 
   const handleInputChange1 = (e) => {
     setInputValue1(e.target.value);
@@ -35,7 +38,6 @@ const Home = () => {
       return;
     }
 
-    const user = auth.currentUser;
     const newDocRef = push(ref(database, "products"));
     const storageReference = storageRef(storage, `products/${newDocRef.key}/${file.name}`);
 
@@ -49,7 +51,7 @@ const Home = () => {
           status: "pending"
         }).then(() => {
           alert("Data saved successfully");
-          fetchProducts(); 
+          fetchProducts();
         }).catch((error) => {
           alert("Error: " + error.message);
         });
@@ -75,7 +77,7 @@ const Home = () => {
       imageUrl: imageUrl
     }).then(() => {
       alert("Product updated successfully");
-      fetchProducts(); 
+      fetchProducts();
       setIsEditing(false);
       setEditProductId(null);
       setInputValue1("");
@@ -93,7 +95,7 @@ const Home = () => {
       const data = snapshot.val();
       const productList = [];
       for (let id in data) {
-        if (data[id].status === "approved") { // Filtrar solo productos aprobados
+        if (data[id].status === "approved") {
           productList.push({ id, ...data[id] });
         }
       }
@@ -105,7 +107,7 @@ const Home = () => {
     const productRef = ref(database, `products/${id}`);
     remove(productRef).then(() => {
       alert("Product deleted successfully");
-      fetchProducts(); 
+      fetchProducts();
     }).catch((error) => {
       alert("Error: " + error.message);
     });
@@ -137,6 +139,7 @@ const Home = () => {
           <button onClick={saveData}>Save data</button>
         )}
       </div>
+      <Notifications userId={user.uid} />
       <div>
         <h2>Product List</h2>
         <ul>

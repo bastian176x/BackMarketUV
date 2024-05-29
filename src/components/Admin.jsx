@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import appFirebase from "../credenciales";
-import { getDatabase, ref, onValue, update } from "firebase/database";
+import { getDatabase, ref, onValue, update, push, set } from "firebase/database";
 
 const database = getDatabase(appFirebase);
 
@@ -23,9 +23,24 @@ const Admin = () => {
     });
   }, []);
 
-  const handleApprove = (id) => {
+  const handleApprove = (id, userId) => {
     const productRef = ref(database, `products/${id}`);
-    update(productRef, { status: "approved" });
+    update(productRef, { status: "approved" })
+      .then(() => {
+        // Añadir una notificación
+        const newNotificationRef = push(ref(database, 'notifications'));
+        return set(newNotificationRef, {
+          userId: userId,
+          message: `Your product ${id} has been approved.`,
+          timestamp: Date.now()
+        });
+      })
+      .then(() => {
+        alert("Product approved and notification sent");
+      })
+      .catch((error) => {
+        alert("Error: " + error.message);
+      });
   };
 
   const handleReject = (id) => {
@@ -49,7 +64,7 @@ const Admin = () => {
                   <div className="btn-group mt-2">
                     <button
                       className="btn btn-success"
-                      onClick={() => handleApprove(product.id)}
+                      onClick={() => handleApprove(product.id, product.userId)}
                     >
                       Aprobar
                     </button>
