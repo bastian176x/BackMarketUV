@@ -45,7 +45,8 @@ const Home = () => {
           productName: inputValue1,
           productDescription: inputValue2,
           imageUrl: downloadURL,
-          userId: user.uid
+          userId: user.uid,
+          status: "pending"
         }).then(() => {
           alert("Data saved successfully");
           fetchProducts(); 
@@ -92,7 +93,9 @@ const Home = () => {
       const data = snapshot.val();
       const productList = [];
       for (let id in data) {
-        productList.push({ id, ...data[id] });
+        if (data[id].status === "approved") { // Filtrar solo productos aprobados
+          productList.push({ id, ...data[id] });
+        }
       }
       setProducts(productList);
     });
